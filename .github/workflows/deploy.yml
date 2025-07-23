@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted 
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
@@ -29,7 +29,13 @@ jobs:
           KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
 
       - name: Set KUBECONFIG env
-        run: export KUBECONFIG=$PWD/kubeconfig.yaml
+        run: echo "KUBECONFIG=$PWD/kubeconfig.yaml" >> $GITHUB_ENV
+
+      - name: Helm lint check
+        run: helm lint ./ --strict
+
+      - name: Render Helm templates (preview)
+        run: helm template myapp ./ --namespace default
 
       - name: Deploy via Helm
         run: |
